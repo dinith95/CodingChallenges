@@ -6,62 +6,35 @@ using System.Threading.Tasks;
 
 namespace LeetCodeSolutions.mediumProblems
 {
-    // question link https://leetcode.com/problems/integer-to-roman/
     public class RomanToInt
     {
-        public string IntToRoman(int num)
+
+        public int GetIntNumber(string romanNumber)
         {
-            string finalResult = string.Empty;
-            Dictionary<int, char> romanIntMap = new Dictionary<int, char>()
+            Dictionary<char, int> romanLetterMap = new Dictionary<char, int>()
             {
-                {1000, 'M' } ,{500 , 'D'} , {100, 'C'} , {50, 'L'} , {10, 'X'}, {5, 'V'}, {1, 'I'}
+                {'M',1000 } , {'D', 500} , {'C', 100} , {'L', 50} , {'X', 10}, {'V', 5} , {'I',1}
             };
-
-            foreach (KeyValuePair<int,char> keyValuePair  in romanIntMap)
+            int result = 0;
+            for (int i = 0; i < romanNumber.Length; i++)
             {
-                 (string result,num) = RecursivelyMap(num, keyValuePair.Key, keyValuePair.Value);
-                if (result == "_")
-                    finalResult = HandleSpecialCase(finalResult, keyValuePair.Value);
+                int num = 0;
+                int numNext = 0;
+                romanLetterMap.TryGetValue(romanNumber[i], out num);
+                if (i + 1 < romanNumber.Length)
+                {
+                    // this is done to correct values for numbers like : IV , IX, XC , XL 
+                    romanLetterMap.TryGetValue(romanNumber[i + 1], out numNext);
+                    if (numNext > num)
+                        result -= num;
+                    else
+                        result += num;
+                }
                 else
-                    finalResult += result;          
+                    result += num;
             }
-            return finalResult;
-           
+
+            return result;
         }
-
-        private string HandleSpecialCase(string finalResult , char charLetter)
-        {
-            if (charLetter == 'C' && finalResult.EndsWith('D'))
-               return  finalResult.Replace("D", "CM");
-
-            if (charLetter == 'C' && finalResult.EndsWith('M'))
-                return finalResult.Replace("M", "MD");
-
-            if (charLetter == 'X' && finalResult.EndsWith('C'))
-                return finalResult.Replace("C", "XL");
-
-            if (charLetter == 'X' && finalResult.EndsWith('L'))
-                return finalResult.Replace("L", "XC");
-
-            if (charLetter == 'I' && finalResult.EndsWith('V'))
-                return finalResult.Replace("V", "IX");
-
-            if (charLetter == 'I' && (finalResult.EndsWith('X') || finalResult)
-                return finalResult.Replace("X", "IV");
-            return finalResult;
-        }
-
-
-        private (string,int) RecursivelyMap(int numtoConvert, int placeValue, char romanLetter)
-        {
-            string result = string.Empty;
-            int quotient = (int)(numtoConvert / placeValue);
-            if(quotient > 3)
-                return ("_", numtoConvert % placeValue);
-            for (int i = 0; i < quotient; i++)
-                result += romanLetter;
-            return (result, numtoConvert % placeValue);
-        }
-
     }
 }
